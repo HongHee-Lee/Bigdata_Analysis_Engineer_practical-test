@@ -1,0 +1,45 @@
+
+import pandas as pd
+
+disease = pd.read_csv("E:\개발자/302_worlddata.csv")
+print(disease.head(5))
+
+print(disease.info())
+
+#1).
+#2000년 행 추출
+disease_2000 = disease[disease['year']==2000]
+print(disease_2000)
+
+
+#2000년 행의 평균구하기
+#2)-1. 평균구하기위한 전처리
+
+#T함수를 활용해 행/열 변환 -> year를 drop으로 삭제 -> axis=0 옵션으로 행기준으로 데이터 삭제
+
+disease_2000_T = disease_2000.T
+disease_2000_T_drop = disease_2000_T.drop(['year'], axis=0)
+disease_2000_T_drop.columns=['value']  
+    #결핵 유병률 값이 표시된 컬럼은 'value'라는 명칭으로 지정한다
+
+print(disease_2000_T_drop)
+
+
+#2)-2. 평균구하기
+mean=disease_2000_T_drop['value'].mean()
+
+print(mean)
+
+
+
+#3)-1.
+#평균보다 큰 값 개수
+disease_final=disease_2000_T_drop[disease_2000_T_drop['value']>mean]  #이해잘안됨
+
+print(disease_final)
+
+#3)-2.
+print(len(disease_final))
+
+
+
