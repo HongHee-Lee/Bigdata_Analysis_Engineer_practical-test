@@ -1,0 +1,47 @@
+
+#작업형 제 1유형
+
+#1번
+#!git clone https://github.com/AnalyticsKnight/yemoonsaBigdata/
+
+
+import pandas as pd
+
+df=pd.read_csv("E:\개발자/301_housing.csv")
+df.info()
+df.head(5)
+
+
+#전체 컬럼 확인 코드
+#print(df.columns.tolist())
+#print(df.columns.values)
+
+#이게 전체 데이터 확인하기 유용한 코드
+with pd.option_context('display.max_rows', 100, 'display.max_columns', None): 
+    display(df)
+
+#help(pd.option_context)
+
+#결측치확인
+print(df.isnull().sum())
+
+
+#결측치 행 모두 제거
+df_drop=df.dropna(how='any', inplace=False)   #any가 default 이므로 생략가능
+print(df_drop.isnull().sum())
+
+
+#70%의 훈련데이터 추출
+df_drop_70 = df_drop.iloc[:int(len(df_drop)*0.7)]
+print(df_drop_70.info())
+
+
+#housing_median_age의 Q1값을 정수로 계산하기
+print(df_drop_70.columns.tolist())   #컬럼확인
+
+with pd.option_context('display.max_rows', 10, 'display.max_columns', None):
+    display(df_drop_70)            #전체 데이터 펼쳐서 출력
+
+#Q1값 정수로 계산
+housing_median_age_Q1=int(df_drop_70['housing_median_age'].quantile(0.25))
+print(housing_median_age_Q1)
