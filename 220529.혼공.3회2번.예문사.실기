@@ -1,0 +1,58 @@
+
+#먼저 데이터를 불러오세요
+import pandas as pd
+df= pd.read_csv("E:\개발자/302_worlddata.csv")
+print(df.info())   #()안에 숫자를 넣으면 193개의 전체 컬럼별로 묶인 데이터가 나타나네요~
+
+print(df.isnull().sum())
+print(df.head(5)) 
+print(display(df))
+print(df.describe())
+
+
+
+
+#2000년도의 평균값 구하기
+
+df.iloc[[1]]    #가로로 쭉~ // df.loc[1]은 세로로 주욱~        
+#다음번 풀땐 처음부터 df.loc[1]로 풀어보자
+
+#세로로 데이터 놓은 상태에서 year만 드랍하는 방법(연습)
+#df_test_drop=df.loc[1].drop(['year'],axis=0)
+
+df_2000=df.loc[df['year']==2000]
+df_2000_2=df[df['year']==2000]    #같은 결과 다른 책의코드
+print(df_2000)
+print(df_2000_2)
+
+
+
+
+#평균값 구하기
+#df_2000.mean()   #이게 안되는이유는 컬럼 별로 평균이 구해져서임( 평균값이 194개가 나옴)
+df_2000_mean=float((df_2000.sum(axis=1)-2000)/193)    # 1  81.01036 이런식으로 나와서 float해줘야됨
+print(df_2000_mean)
+
+#year칼럼 drop 하기
+df_2000_drop=df.iloc[[1]].drop(['year'],axis=1)
+
+
+#가로로 누운 자료를 다시 세로로 세우기..
+df_2000_drop_1=df_2000_drop.loc[1]
+
+
+
+#나의 평균값보다 큰 개수 구하는 원시적 방법 
+#책코드는 평균값보다 큰녀석만으로 새로운 데이터 구성하고 len(새데이터)로 개수 구하는 빠른 방법
+count=0
+for i in range(len(df_2000_drop_1)):
+    if df_2000_drop_1[i]>df_2000_mean:
+        count+=1
+
+print(count)
+#76
+
+#책코드 흉내
+df_final=df_2000_drop_1[df_2000_drop_1>df_2000_mean]
+print(len(df_final))
+#76
