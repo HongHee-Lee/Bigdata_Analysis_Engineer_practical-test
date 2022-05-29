@@ -1,0 +1,34 @@
+
+#housing csv파일 로딩
+import pandas as pd
+
+housing = pd.read_csv("./yemoonsaBigdata/datasets/Part3/301_housing.csv")
+print(housing.head(5))
+
+
+
+#결측값 확인
+print(housing.info())
+
+
+#1).결측치 제거
+housing_dropna = housing.dropna(inplace=False)
+
+print("원본데이터 건수 : ", len(housing))
+print("결측값제거 데이터 건수 : ", len(housing_dropna))
+
+
+#2).70% 훈련데이터 추출
+housing_dropna_70=housing_dropna.iloc[:int(len(housing_dropna)*0.7)]
+
+print("70%추출 데이터 건수 : ", len(housing_dropna_70))
+
+
+#3).Q1값 (정수로)계산
+result= int(housing_dropna_70['housing_median_age'].quantile(0.25))
+
+    #print(housing_dropna_70.info())   #새로 생성한 데이터 변수 확인용
+
+print(result)
+
+
