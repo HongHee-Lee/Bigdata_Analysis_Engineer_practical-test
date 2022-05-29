@@ -1,0 +1,32 @@
+
+#3번 결측치의 비율이 가장 높은 변수?
+!git clone https://github.com/AnalyticsKnight/yemoonsaBigdata/
+
+#데이터 탐색
+import pandas as pd
+titanic = pd.read_csv("./yemoonsaBigdata/datasets/Part3/303_titanic.csv")
+titanic.head(5)
+
+
+#결측값 탐색
+print(titanic.info())
+
+
+#결측값 개수 집계 
+titanic_isna = titanic.isna().sum()
+print(titanic_isna)
+
+
+#컬럼별 결측값 개수 집계
+titanic_isna=titanic.isna().sum()
+print(titanic_isna)
+
+
+#결측값 개수 집계값이 최대가 되는 인덱스 값
+max_ind = titanic_isna.argmax()
+print(max_ind)
+
+#인덱스 이름 출력하기
+result = titanic_isna.index[max_ind]
+print(result)
+
