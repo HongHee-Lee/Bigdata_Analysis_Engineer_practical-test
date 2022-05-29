@@ -1,0 +1,142 @@
+
+#3회 실기
+#작업형 제2유형 
+!git clone https://github.com/AnalyticsKnight/yemoonsaBigdata/
+
+import pandas as pd
+df_train=pd.read_csv("./yemoonsaBigdata/datasets/Part3/304_travel_insurance_train.csv")
+df_test=pd.read_csv("./yemoonsaBigdata/datasets/Part3/304_travel_insurance_test.csv")
+print(df_train.head(5))
+
+
+
+##훈련데이터 추출
+x_train = df_train.drop(columns='TravelInsurance')
+y_train = df_train[['ID', 'TravelInsurance']]
+
+x_test = df_test.copy()     #copy쓰면 속도가 빨라짐
+
+#별도의 분할된 csv파일로 저장해 놓는다
+x_train.to_csv('E:\개발자/304_x_train.csv', index=False)
+y_train.to_csv('E:\개발자/304_y_train.csv', index=False)
+x_test.to_csv('E:\개발자/304_x_test.csv;', index=False)
+
+x_train = pd.read_csv("./yemoonsaBigdata/datasets/Part3/304_x_train.csv")
+y_train = pd.read_csv("./yemoonsaBigdata/datasets/Part3/304_y_train.csv")
+x_test = pd.read_csv("./yemoonsaBigdata/datasets/Part3/304_x_test.csv")
+
+print(x_train.shape, y_train.shape, x_test.shape)   #약 75%/25%의 비율로 분할됨 확인
+
+
+
+#concat으로 하나의 데이터로 구성
+df_x=pd.concat([x_train, x_test])
+print(df_x.info())
+
+
+
+#명목형 데이터 4개 변수에 대해 라벨링 인코딩 진행.
+df_le = df_x.copy()
+df_le['Employment Type']= df_x['Employment Type'].replace(['Private Sector/Self Employed', 'Government Sector'], [0,1])
+df_le['GraduateOrNot']=df_x['GraduateOrNot'].replace(['No', 'Yes'], [0,1])
+df_le['FrequentFlyer']=df_x['FrequentFlyer'].replace(['No', 'Yes'],[0,1])
+df_le['EverTravelledAbroad']=df_x['EverTravelledAbroad'].replace(['No', 'Yes'], [0,1])
+
+print(df_le.info())
+
+
+
+#roc_auc_score 계산 목적의 파이썬 함수를 생성한다.
+from sklearn.metrics import roc_auc_score
+
+def get_scores(model, xtrain, xtest, ytrain, ytest):
+    A = model.score(xtrain, ytrain)
+    ypred = model.predict_proba(xtest)[:, 1]
+    B = roc_auc_score(ytest,ypred)
+    return '{:.4f} {:.4f}'.format(A,B)
+
+
+
+#분류를 위한 4가지 머신러닝 모델 실행 함수 생성. 
+from sklearn.linear_model import LogisticRegression
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+
+from xgboost import XGBClassifier
+
+
+
+def make_models(xtrain, xtest, ytrain, ytest):
+    model1 = LogisticRegression().fit(xtrain, ytrain)
+    print('model1', get_scores(model1, xtrain, xtest, ytrain, ytest))
+    
+    model2=DecisionTreeClassifier(random_state=0).fit(xtrain, ytrain)
+    print('model2', get_scores(model2, xtrain, xtest, ytrain, ytest))
+    
+    for d in range(3,8):
+        model2=DecisionTreeClassifier(max_depth=d, random_state=0).fit(xtrain,ytrain)
+        print('model2', d, get_scores(model2, xtrain, xtest, ytrain, ytest))
+    
+    model3= RandomForestClassifier(random_state=0).fit(xtrain, ytrain)
+    print('model3', get_scores(model3, xtrain, xtest, ytrain, ytest))
+
+    for d in range(3,8):
+        model3=RandomForestClassifier(500, max_depth=d, random_state=0).fit(xtrain, ytrain)
+        print('model3', d, get_scores(model3, xtrain, xtest, ytrain, ytest))
+        
+    model4 = XGBClassifier(eval_metric='logloss', use_label_encoder=False).fit(xtrain, ytrain)
+    print('model4', get_scores(model4, xtrain, xtest, ytrain, ytest))
+
+
+
+
+from sklearn.preprocessing import MinMaxScaler
+x_le=df_le.drop(columns=['ID'])    #무관한 독립변수 제거
+
+x_le_train=x_le[:1490]
+x_le_test=x_le[1490:]
+
+#머신러닝 모델의 정확도를 높이기 위해 최대-최소 정규화 방식으로
+#정수형 데이터의 스케일링을 수행한다
+scaler = MinMaxScaler()   
+scaler.fit(x_le_train)
+x_fin_train = scaler.transform(x_le_train)
+x_fin_test=scaler.transform(x_le_test)
+
+y_fin_train = y_train['TravelInsurance']
+
+print(type(x_fin_train), type(x_fin_test), type(y_fin_train))
+print(x_fin_train.shape, x_fin_test.shape, y_fin_train.shape)
+#이상 독립변수에 대하여 라벨링 인코딩과 스케일링 작업을 통해 전처리 작업 완료
+
+
+
+
+#기존 훈련 데이터 x_fin_train과 y_fin_train을 기반으로
+#약 25%의 검증 데이터 세트(xtest, ytest)를 추출한다.
+from sklearn.model_selection import train_test_split
+xtrain, xtest, ytrain, ytest= train_test_split(x_fin_train, y_fin_train, test_size = 0.25,
+                                               stratify = y_fin_train, random_state=1234)
+
+print(xtrain.shape, xtest.shape, ytrain.shape, ytest.shape)
+
+
+
+
+#머신러닝 모델 생성 함수를 실행
+make_models(xtrain, xtest, ytrain, ytest)
+
+
+
+#DecisionTreeClassifier에서 max_depth 옵션 입력값을 4로 지정한 머신러닝 학습모델을 최종 선택
+final_model=DecisionTreeClassifier(max_depth=4, random_state=0).fit(xtrain,ytrain)
+print('final model', get_scores(final_model, xtrain, xtest, ytrain, ytest))
+
+
+
+#예측 확률값 계산
+y_pred=final_model.predict_proba(x_fin_test)[:,1]
+result=pd.DataFrame({"y_pred" : y_pred})
+result.to_csv("E:\개발자/insurance_y_pred.csv")
+
+
