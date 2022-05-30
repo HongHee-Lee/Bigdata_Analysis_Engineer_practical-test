@@ -36,8 +36,24 @@ print(df2_t)
 for i in df.columns:
     if df[i].isnull().sum()==max(df.isnull().sum()):
         print(i)
-        
-        
+ """Age"""       
+
+
+
+#비율이란 의미에 좀더 충실한 답(아래)
+df_isna=df.isnull().sum()
+
+ratio_max=0
+a=len(df.columns)
+for i in range(a):
+    if ratio_max< int(df_isna[i])/len(df[df.columns[i]]):
+        ratio_max=int(df_isna[i])/len(df[df.columns[i]])
+        ratio_max_col=df_isna.index[i]
+    
+print(ratio_max_col)
+
+"""Age"""
+
 """
 print(df.isnull().sum())
 
