@@ -1,0 +1,49 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Mon May 30 22:25:04 2022
+
+@author: greenysky
+"""
+
+#데이터를 불러오세요
+import pandas as pd
+df= pd.read_csv("E:/개발자/303_titanic.csv")
+print(df.head(5))
+print(display(df))
+print(df.describe)
+print(df.columns)
+
+
+
+#--------------------------------------------------------
+#row column transpose
+df2=pd.DataFrame(data=df)
+print(df2)
+
+#row column transpose
+#df.T
+#df.transpose()
+df2_transposed=df2.T  #or df2.transpose()
+print(df2_transposed)
+
+#row column transpose 
+df2_t=df2_transposed.T
+print(df2_t)
+#transpose 함수를 2번 사용하니 원래 DataFrame으로 만든 데이터로 다시 돌아옴!!
+#-----------------------------------------------------------
+
+
+for i in df.columns:
+    if df[i].isnull().sum()==max(df.isnull().sum()):
+        print(i)
+        
+        
+"""
+print(df.isnull().sum())
+
+df.info()
+len(df['Age'])
+len(df['Cabin'])
+max(len(df))
+len(df['PassengerId'])
+"""
