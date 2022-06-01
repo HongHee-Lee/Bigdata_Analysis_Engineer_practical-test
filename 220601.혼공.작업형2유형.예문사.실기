@@ -1,0 +1,17 @@
+
+#데이터 불러오기
+
+import pandas as pd
+train=pd.read_csv("E:\개발자/304_travel_insurance_train.csv")
+test=pd.read_csv("E:\개발자/304_travel_insurance_test.csv")
+
+pd.set_option('display.max_columns', None)    #전체 컬럼을 다보여주는 코드
+
+print(train.info(), test.info())
+print(display(train), display(test))   #더 정확히보여준다
+print(train.describe, test.describe)   #컬럼이 밀려서 표시됨/None None이 안뜨는 장점 있음
+print(train.head(5), test.head(5))
+print(train.columns,'\n','\n', test.columns)
+
+
+#이하 예문사 답을 보고 거의 그대로 공부해보겠음. 분류 분석 예시로써 암기 목표
