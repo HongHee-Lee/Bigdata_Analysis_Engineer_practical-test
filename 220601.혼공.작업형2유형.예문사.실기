@@ -14,4 +14,40 @@ print(train.head(5), test.head(5))
 print(train.columns,'\n','\n', test.columns)
 
 
-#이하 예문사 답을 보고 거의 그대로 공부해보겠음. 분류 분석 예시로써 암기 목표
+
+
+#데이터 전처리 (라벨링 및 인코딩)
+
+#결측값 확인- 결측값없음
+print(train.isnull().sum())
+train.isna().sum()   #isnull 과 isna는 같은 함수라고함(구글링)
+
+
+#
+#train에서 TravelInsurance 드랍drop해서 x_train에 넣어주고
+#y_train에 ID와 TravelInsurance 를 넣어준다
+train_drop=train.drop(['TravelInsurance'],inplace=False, axis=1)
+print(train_drop)
+
+#drop 한 데이터 확인해주고
+print(display(train_drop), display(test))
+
+#train_drop 에서 employment type 열의 종류 확인
+#['Government Sector', 'Private Sector/Self Employed']
+train_drop.index['Employment Type']
+print(train_drop.axes[].tolist())
+
+
+
+
+
+#Employment Type에서 
+#'Government Sector'은 0으로
+#'Private Sector/Self Employed'은 1로 각각 바꿔줍니다
+train_preproc=train_drop.copy()
+train_preproc['Government Sector']=train_drop['Government Sector'].replace(['Government Sector', 'Private Sector/Self Employed'],[0,1])
+print(train_preproc)
+
+
+#GraduateOrNot #FrequentFlyer #EverTravelledAbroad
+#각각 yes는 1로 no는 0으로 바꿔줍니다.
