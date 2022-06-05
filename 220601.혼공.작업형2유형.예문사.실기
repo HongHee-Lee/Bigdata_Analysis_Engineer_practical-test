@@ -10,10 +10,14 @@ pd.set_option('display.max_columns', None)    #전체 컬럼을 다보여주는 
 print(train.info(), test.info())
 print(display(train), display(test))   #더 정확히보여준다
 print(train.describe, test.describe)   #컬럼이 밀려서 표시됨/None None이 안뜨는 장점 있음
+#train.describe
+#train.describe()   위아래는 다른 결과. ()있으면 count mean std min등 알수 있음
 print(train.head(5), test.head(5))
 print(train.columns,'\n','\n', test.columns)
-
-
+"""
+print(train_drop.axes[0].tolist()) #행 명 출력하는 방법
+print(train_drop.axes[1].tolist())   #컬럼명 출력하는 방법    
+"""
 
 
 #데이터 전처리 (라벨링 및 인코딩)
@@ -23,31 +27,60 @@ print(train.isnull().sum())
 train.isna().sum()   #isnull 과 isna는 같은 함수라고함(구글링)
 
 
+
+
+#음 print(display(train), display(test))으로 보니 Employment Type에서 데이터 종류?가 몇개나 되는지 봐야겠군
+#train 에서 employment type 열의 종류 확인
+tdg=train.groupby(['Employment Type']).sum()       #groupby 사용법 잘봐두기
+print(tdg)
+#train.pivot(columns='Employment Type').sum()   #이거보다 위에 groupby가 더 편함
+#['Government Sector', 'Private Sector/Self Employed'] 두개가 있구나~
+"""
+자투리 공부
+tdg=train.sort_values(['Employment Type'])       #sort_values는 같은 데이터끼리 정렬
+print(tdg)
+"""
+
+#Employment Type에서 
+#'Government Sector'은 0으로
+#'Private Sector/Self Employed'은 1로 각각 바꿔줍니다
+train_pre=train.copy()
+train_pre['Employment Type']=train_pre['Employment Type'].replace(['Government Sector', 'Private Sector/Self Employed'],[0,1])
+print(train_pre)
+
+#yes/no로 구성된 칼럼의 값들을 yes 를 1 no를 0으로 바꿔준다
+train_pre['GraduateOrNot']=train_pre['GraduateOrNot'].replace(['Yes','No'],[1,0])
+train_pre['FrequentFlyer']=train_pre['FrequentFlyer'].replace(['Yes','No'],[1,0])
+train_pre['EverTravelledAbroad']=train_pre['EverTravelledAbroad'].replace(['Yes','No'],[1,0])
+print(train_pre)
+
+
+
+
+
+#이제 스케일링을 해야하는데 ID와 TravelInsurance는 영향을 받지 않도록 따로 빼줘야 할듯하네요
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 #
 #train에서 TravelInsurance 드랍drop해서 x_train에 넣어주고
-#y_train에 ID와 TravelInsurance 를 넣어준다
+#x_test에 ID와 TravelInsurance 를 넣어준다
 train_drop=train.drop(['TravelInsurance'],inplace=False, axis=1)
 print(train_drop)
 
 #drop 한 데이터 확인해주고
 print(display(train_drop), display(test))
-
-#train_drop 에서 employment type 열의 종류 확인
-#['Government Sector', 'Private Sector/Self Employed']
-train_drop.index['Employment Type']
-print(train_drop.axes[].tolist())
-
-
-
-
-
-#Employment Type에서 
-#'Government Sector'은 0으로
-#'Private Sector/Self Employed'은 1로 각각 바꿔줍니다
-train_preproc=train_drop.copy()
-train_preproc['Government Sector']=train_drop['Government Sector'].replace(['Government Sector', 'Private Sector/Self Employed'],[0,1])
-print(train_preproc)
-
-
-#GraduateOrNot #FrequentFlyer #EverTravelledAbroad
-#각각 yes는 1로 no는 0으로 바꿔줍니다.
