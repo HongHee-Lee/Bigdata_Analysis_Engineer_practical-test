@@ -41,7 +41,13 @@ print(df_drop_70.columns.tolist())   #컬럼확인
 
 with pd.option_context('display.max_rows', 10, 'display.max_columns', None):
     display(df_drop_70)            #전체 데이터 펼쳐서 출력
-
+"""
 #Q1값 정수로 계산
 housing_median_age_Q1=int(df_drop_70['housing_median_age'].quantile(0.25))
 print(housing_median_age_Q1)
+#19
+"""
+#사분위수 값구하는 나만의? 방법
+a=df_drop_70['housing_median_age'].describe()
+a.loc['25%']
+#19.0
