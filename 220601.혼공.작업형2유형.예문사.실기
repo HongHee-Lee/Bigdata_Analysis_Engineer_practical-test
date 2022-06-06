@@ -1,4 +1,3 @@
-
 #데이터 불러오기
 
 import pandas as pd
@@ -33,6 +32,8 @@ train.isna().sum()   #isnull 과 isna는 같은 함수라고함(구글링)
 #train 에서 employment type 열의 종류 확인
 tdg=train.groupby(['Employment Type']).sum()       #groupby 사용법 잘봐두기
 print(tdg)
+
+
 #train.pivot(columns='Employment Type').sum()   #이거보다 위에 groupby가 더 편함
 #['Government Sector', 'Private Sector/Self Employed'] 두개가 있구나~
 """
@@ -40,13 +41,14 @@ print(tdg)
 tdg=train.sort_values(['Employment Type'])       #sort_values는 같은 데이터끼리 정렬
 print(tdg)
 """
+"""
+#train 데이터 전처리
 
 #Employment Type에서 
 #'Government Sector'은 0으로
 #'Private Sector/Self Employed'은 1로 각각 바꿔줍니다
 train_pre=train.copy()
 train_pre['Employment Type']=train_pre['Employment Type'].replace(['Government Sector', 'Private Sector/Self Employed'],[0,1])
-print(train_pre)
 
 #yes/no로 구성된 칼럼의 값들을 yes 를 1 no를 0으로 바꿔준다
 train_pre['GraduateOrNot']=train_pre['GraduateOrNot'].replace(['Yes','No'],[1,0])
@@ -54,12 +56,70 @@ train_pre['FrequentFlyer']=train_pre['FrequentFlyer'].replace(['Yes','No'],[1,0]
 train_pre['EverTravelledAbroad']=train_pre['EverTravelledAbroad'].replace(['Yes','No'],[1,0])
 print(train_pre)
 
+#test 데이터 전처리
+test_pre=test.copy()
+test_pre['Employment Type']=test_pre['Employment Type'].replace(['Government Sector', 'Private Sector/Self Employed'],[0,1])
+
+test_pre['GraduateOrNot']=test_pre['GraduateOrNot'].replace(['Yes','No'],[1,0])
+test_pre['FrequentFlyer']=test_pre['FrequentFlyer'].replace(['Yes','No'],[1,0])
+test_pre['EverTravelledAbroad']=test_pre['EverTravelledAbroad'].replace(['Yes','No'],[1,0])
+print(test_pre)
+
+#여기서 ID, TravelInsurance 컬럼을 드랍해준다
+train_pre=train_pre.drop(['ID','TravelInsurance'],axis=1)
+test_pre=test_pre.drop(['ID'],axis=1)
+print(train_pre , test_pre)
+"""
+
+
+#위에껀 나눠서 전처리
+#아래는 concat으로 합쳐서 한꺼번에 전처리 후 다시 데이터 나눈거
+
+#먼저 ID, TravelInsurance 드랍
+t1=train.drop(['ID','TravelInsurance'],axis=1)
+t2=test.drop(['ID'],axis=1)
+
+a=pd.concat([t1,t2])
+a_pre=a.copy()
+print(a_pre.isnull().sum())
+a_pre['Employment Type']=a_pre['Employment Type'].replace(['Government Sector', 'Private Sector/Self Employed'],[0,1])
+
+a_pre['GraduateOrNot']=a_pre['GraduateOrNot'].replace(['Yes','No'],[1,0])
+a_pre['FrequentFlyer']=a_pre['FrequentFlyer'].replace(['Yes','No'],[1,0])
+a_pre['EverTravelledAbroad']=a_pre['EverTravelledAbroad'].replace(['Yes','No'],[1,0])
+print(a_pre)
+
+#나누기
+train_pre=a_pre.iloc[:1490]
+test_pre=a_pre.iloc[1490:]
+print(train_pre)
+print(test_pre)
 
 
 
 
-#이제 스케일링을 해야하는데 ID와 TravelInsurance는 영향을 받지 않도록 따로 빼줘야 할듯하네요
 
+
+#이제 train_pre와 test_pre를 스케일링 할차례
+from sklearn.preprocessing import MinMaxScaler
+
+mmscaler=MinMaxScaler()
+
+mmscaler.fit(train_pre)
+train_pre_sc=mmscaler.transform(train_pre)
+mmscaler.fit(test_pre)
+test_pre_sc=mmscaler.transform(test_pre)
+
+print('\n'*4,train_pre_sc, '\n'*4,test_pre_sc,'\n'*2)
+print('train_pre_sc','\n max:',train_pre_sc.max(),'\n min:',train_pre_sc.min(),'\n mean:',train_pre_sc.mean(),'\n'*2,)
+print('test_pre_sc','\n max:', test_pre_sc.max(),'\n min:', test_pre_sc.min(),'\n mean:', test_pre_sc.mean())
+
+#예문사에서 알려주는 array 형태확인 
+print(train_pre_sc.shape)
+print(test_pre_sc.shape)
+
+#스케일링 완료 
+#모든데이터값 max :1 min: 0으로 최대최소정규화 완료
 
 
 
