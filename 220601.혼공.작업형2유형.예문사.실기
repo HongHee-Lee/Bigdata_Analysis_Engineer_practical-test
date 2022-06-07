@@ -159,7 +159,7 @@ def make_models(xtrain, xtest, ytrain, ytest):
     model1 = LogisticRegression().fit(xtrain, ytrain)
     print('model1 ', get_scores(model1, xtrain, xtest, ytrain, ytest))
     
-    model2 = DecisionTreeClassifier(random_state=0).fit(xtrain.ytrain)
+    model2 = DecisionTreeClassifier(random_state=0).fit(xtrain,ytrain)
     print('model2 ', get_scores(model2, xtrain, xtest, ytrain, ytest))
     
     for d in range(3,8):
@@ -195,12 +195,33 @@ def get_scores(model, xtrain, xtest, ytrain, ytest):
     
     ypred=model.predict(xtest)  #x test로 예측값얻기
     
-    mae=mean_absolute_error(ytest,ypred)
-    mse=mean_squared_error(ytest,ypred)
+    mape=np.mean(np.abs(1-ypred/ytest))*100
+    #mse=mean_squared_error(ytest,ypred)
     r2=r2_score(ytest,ypred)
-    return '{:.4f} {:.4f} {:.4f} {:.4f}'.format(score,mae,mse,r2)
+    #return '{:.4f} {:.4f} {:.4f} {:.4f}'.format(score,mae,mse,r2)
+    return '{:.4f} {:.4f}'.format(score,mape)
 
+#-------------------------------------------------------------------------
+"""
+#ypred가 뭔지 궁금하면 요거 실행시켜봐여
+ypred=DecisionTreeClassifier(max_depth=3, random_state=0).fit(xtrain,ytrain).predict(xtest)  #x test로 예측값얻기
+print(ypred)
 
+요러케 나옴
+[0 0 0 0 0 0 0 0 0 0 1 0 0 0 1 0 0 0 0 0 1 0 0 1 0 0 0 1 0 0 0 1 0 0 0 0 0
+ 1 0 0 0 0 0 0 1 0 0 0 1 0 0 1 0 0 0 0 1 0 1 0 1 1 0 0 0 0 1 0 0 1 1 0 1 0
+ 0 0 0 0 1 0 0 0 0 0 1 0 0 0 0 0 1 0 1 0 1 1 0 0 0 0 0 1 0 0 0 0 0 1 1 0 1
+ 0 0 0 0 0 0 0 0 1 0 0 0 0 1 0 0 1 0 0 0 0 1 0 0 0 0 0 1 1 0 0 0 1 0 0 0 0
+ 1 0 0 0 1 0 0 0 0 0 0 0 0 1 0 0 0 0 1 0 0 0 0 0 0 1 0 0 0 0 0 1 0 1 1 0 0
+ 0 0 0 0 1 0 1 0 0 0 0 1 0 1 1 0 1 0 0 1 0 0 1 0 0 1 0 0 0 0 0 0 0 1 0 0 0
+ 1 1 0 0 0 0 0 0 1 0 0 1 0 0 0 1 0 1 0 0 0 0 0 0 1 0 0 0 0 1 0 0 0 1 0 0 0
+ 0 0 0 0 0 0 1 1 0 0 1 0 1 0 0 0 0 0 0 0 0 0 0 0 0 1 1 0 1 0 0 1 1 0 0 0 0
+ 0 0 1 0 0 0 1 0 1 0 0 0 1 0 1 0 1 0 0 0 0 0 0 1 0 1 1 0 0 0 0 0 0 0 1 0 1
+ 0 0 0 0 1 0 0 0 1 0 0 0 0 1 0 1 0 0 0 0 0 1 0 0 0 1 0 0 0 1 1 0 0 0 0 1 0
+ 0 0 0]
+
+의사결정 나무에 의해 0,1로 travelinsurance가 얼마나 잘 분류되었는지 평가하려면 roc_auc_curve로 평가해야할듯
+"""
 
 #------------------------------------------------------------------------------------
 
@@ -214,12 +235,17 @@ xtrain, xtest, ytrain, ytest=train_test_split(x_fin_train, y_fin_train, test_siz
 
 print(xtrain.shape, xtest.shape, ytrain.shape, ytest.shape)
 
-
-
+    ypred=DecisionTreeClassifier(max_depth=3, random_state=0).fit(xtrain,ytrain).predict(xtest)  #x test로 예측값얻기
+print(ypred)
 #------------------------------------------------------------------------------------
 
 #머신러닝 모델 생성 함수를 실행
 make_models(xtrain, xtest, ytrain, ytest)
+
+
+
+
+
 
 #
 #train에서 TravelInsurance 드랍drop해서 x_train에 넣어주고
