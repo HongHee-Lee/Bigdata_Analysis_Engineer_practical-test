@@ -17,6 +17,7 @@ import pandas as pd
 train=pd.read_csv("E:\개발자/304_travel_insurance_train.csv")
 test=pd.read_csv("E:\개발자/304_travel_insurance_test.csv")
 
+
 pd.set_option('display.max_columns', None)    #전체 컬럼을 다보여주는 코드
 
 print(train.info(), test.info())
@@ -232,12 +233,14 @@ print(feature_importances)
 
 #결정트리의 분류 의사결정 시각화 . Graphviz로 결정트리를 시각화할 수 있다.
 import numpy as np
-feature_names=train_pre
+train2=train.drop(['ID'], axis=1, inplace=False)
+feature_columns=list(train2.columns.difference(['TravelInsurance']))
+feature_names=feature_columns
 target_names=np.array(['0','1'])
 
 import pydot
 import pydotplus
-import Graphviz
+import graphviz
 from sklearn.tree import export_graphviz
 dt_dot_data=export_graphviz(clf,feature_names=feature_names,class_names=target_names,
                             filled=True, rounded=True, special_characters=True)
@@ -245,3 +248,38 @@ dt_graph=pydotplus.graph_from_dot_data(dt_dot_data)
 
 from IPython.display import Image
 Image(dt_graph.create_png())
+
+
+"""
+결과
+
+혼동행렬 : 
+ [[185   5]
+ [ 42  66]]
+
+
+정확도 : 0.8422818791946308
+정밀도 : 0.9295774647887324
+재현율 : 0.6111111111111112
+f1 : 0.7374301675977653
+              precision    recall  f1-score   support
+
+           0       0.81      0.97      0.89       190
+           1       0.93      0.61      0.74       108
+
+    accuracy                           0.84       298
+   macro avg       0.87      0.79      0.81       298
+weighted avg       0.86      0.84      0.83       298
+
+ROC AUC sore :  0.8136939571150097
+                   col  importances
+0                  Age     0.092200
+1      Employment Type     0.000000
+2        GraduateOrNot     0.002072
+3         AnnualIncome     0.729318
+4        FamilyMembers     0.176411
+5      ChronicDiseases     0.000000
+6        FrequentFlyer     0.000000
+7  EverTravelledAbroad     0.000000
+
+"""
