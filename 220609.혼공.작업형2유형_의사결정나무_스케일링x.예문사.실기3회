@@ -266,3 +266,14 @@ ROC AUC sore :  0.8136939571150097
 7  EverTravelledAbroad     0.000000
 
 """
+
+
+#----------------------------------------------------------------------
+
+#결과를 예측확률값으로 계산한다.
+y_pred=clf.predict_proba(x_fin_test)[:,1]
+print(y_pred)
+
+#결과를 csv파일로 저장
+result=pd.DataFrame({"y_pred" : y_pred})
+result.to_csv("E:\개발자/insurance_y_pred.csv")
