@@ -1,0 +1,399 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Tue May 31 20:39:01 2022
+
+@author: greenysky
+"""
+#데이터 불러오기
+
+import pandas as pd
+train=pd.read_csv("E:\개발자/304_travel_insurance_train.csv")
+test=pd.read_csv("E:\개발자/304_travel_insurance_test.csv")
+
+
+pd.set_option('display.max_columns', None)    #전체 컬럼을 다보여주는 코드
+
+print(train.info(), test.info())
+print(display(train), display(test))   #더 정확히보여준다
+print(train.describe, test.describe)   #컬럼이 밀려서 표시됨/None None이 안뜨는 장점 있음
+#train.describe
+#train.describe()   위아래는 다른 결과. ()있으면 count mean std min등 알수 있음
+print(train.head(5), test.head(5))
+print(train.columns,'\n','\n', test.columns)
+"""
+print(train_drop.axes[0].tolist()) #행 명 출력하는 방법
+print(train_drop.axes[1].tolist())   #컬럼명 출력하는 방법    
+"""
+#------------------------------------------------------------------------------------
+
+#데이터 전처리 (라벨링 및 인코딩)
+
+#결측값 확인- 결측값없음
+print(train.isnull().sum())
+train.isna().sum()   #isnull 과 isna는 같은 함수라고함(구글링)
+
+
+
+
+#음 print(display(train), display(test))으로 보니 Employment Type에서 데이터 종류?가 몇개나 되는지 봐야겠군
+#train 에서 employment type 열의 종류 확인
+tdg=train.groupby(['Employment Type']).sum()       #groupby 사용법 잘봐두기
+print(tdg)
+
+
+#train.pivot(columns='Employment Type').sum()   #이거보다 위에 groupby가 더 편함
+#['Government Sector', 'Private Sector/Self Employed'] 두개가 있구나~
+"""
+자투리 공부
+tdg=train.sort_values(['Employment Type'])       #sort_values는 같은 데이터끼리 정렬
+print(tdg)
+"""
+"""
+#train 데이터 전처리
+
+#Employment Type에서 
+#'Government Sector'은 0으로
+#'Private Sector/Self Employed'은 1로 각각 바꿔줍니다
+train_pre=train.copy()
+train_pre['Employment Type']=train_pre['Employment Type'].replace(['Government Sector', 'Private Sector/Self Employed'],[0,1])
+
+#yes/no로 구성된 칼럼의 값들을 yes 를 1 no를 0으로 바꿔준다
+train_pre['GraduateOrNot']=train_pre['GraduateOrNot'].replace(['Yes','No'],[1,0])
+train_pre['FrequentFlyer']=train_pre['FrequentFlyer'].replace(['Yes','No'],[1,0])
+train_pre['EverTravelledAbroad']=train_pre['EverTravelledAbroad'].replace(['Yes','No'],[1,0])
+print(train_pre)
+
+#test 데이터 전처리
+test_pre=test.copy()
+test_pre['Employment Type']=test_pre['Employment Type'].replace(['Government Sector', 'Private Sector/Self Employed'],[0,1])
+
+test_pre['GraduateOrNot']=test_pre['GraduateOrNot'].replace(['Yes','No'],[1,0])
+test_pre['FrequentFlyer']=test_pre['FrequentFlyer'].replace(['Yes','No'],[1,0])
+test_pre['EverTravelledAbroad']=test_pre['EverTravelledAbroad'].replace(['Yes','No'],[1,0])
+print(test_pre)
+
+#여기서 ID, TravelInsurance 컬럼을 드랍해준다
+train_pre=train_pre.drop(['ID','TravelInsurance'],axis=1)
+test_pre=test_pre.drop(['ID'],axis=1)
+print(train_pre , test_pre)
+"""
+
+
+#위에껀 나눠서 전처리
+#아래는 concat으로 합쳐서 한꺼번에 전처리 후 다시 데이터 나눈거
+
+#먼저 ID, TravelInsurance 드랍
+t1=train.drop(['ID','TravelInsurance'],axis=1)
+t2=test.drop(['ID'],axis=1)
+
+a=pd.concat([t1,t2])
+a_pre=a.copy()
+print(a_pre.isnull().sum())
+a_pre['Employment Type']=a_pre['Employment Type'].replace(['Government Sector', 'Private Sector/Self Employed'],[0,1])
+
+a_pre['GraduateOrNot']=a_pre['GraduateOrNot'].replace(['Yes','No'],[1,0])
+a_pre['FrequentFlyer']=a_pre['FrequentFlyer'].replace(['Yes','No'],[1,0])
+a_pre['EverTravelledAbroad']=a_pre['EverTravelledAbroad'].replace(['Yes','No'],[1,0])
+print(a_pre)
+
+#나누기
+train_pre=a_pre.iloc[:1490]
+test_pre=a_pre.iloc[1490:]
+print(train_pre)
+print(test_pre)
+
+
+
+
+
+
+#이제 train_pre와 test_pre를 스케일링 할차례
+from sklearn.preprocessing import MinMaxScaler
+
+mmscaler=MinMaxScaler()
+
+#mmscaler.fit(train_pre)
+#x_fin_train=mmscaler.transform(train_pre)
+x_fin_train=mmscaler.fit_transform(train_pre)
+#한줄로 줄인코드
+
+#mmscaler.fit(test_pre)
+#x_fin_test=mmscaler.transform(test_pre)
+x_fin_test=mmscaler.fit_transform(test_pre)
+#한줄로 줄인코드
+
+print('\n'*4,x_fin_train, '\n'*4,x_fin_test,'\n'*2)
+print('x_fin_train','\n max:',x_fin_train.max(),'\n min:',x_fin_train.min(),'\n mean:',x_fin_train.mean(),'\n'*2,)
+print('x_fin_test','\n max:', x_fin_test.max(),'\n min:', x_fin_test.min(),'\n mean:', x_fin_test.mean())
+#스케일링 완료 
+#모든데이터값 max :1 min: 0으로 최대최소정규화 완료
+
+
+#y_fin_train 생성
+y_fin_train=train['TravelInsurance']
+print(y_fin_train)
+
+
+
+#예문사에서 알려주는 array 형태확인 
+print(x_fin_train.shape)
+print(x_fin_test.shape)
+print(y_fin_train.shape)
+
+
+
+
+
+#--------------------------------------------------------------
+#의사결정 나무로 분류분석 수행하기
+
+#데이터 나누기
+from sklearn.model_selection import train_test_split
+xtrain, xtest, ytrain, ytest=train_test_split(x_fin_train,y_fin_train, 
+                                              stratify=y_fin_train,test_size=0.2, random_state=1)
+
+print(xtrain.shape)
+print(xtest.shape)
+print(ytrain.shape)
+print(ytest.shape)
+
+
+#---------------------------------------------------------------------------
+#DecisionTreeClassifier로 모델 학습
+from sklearn.tree import DecisionTreeClassifier
+dt_clf=DecisionTreeClassifier(max_depth=3).fit(xtrain,ytrain)
+
+#---------------------------------------------------------------------------
+#predict(xtest)로 예측하고 pred에 저장한다.
+dt_pred=dt_clf.predict(xtest)
+
+print(dt_clf.score(xtest, ytest))
+#--------------------------------------------------------
+
+
+
+
+#RandomForestClassifier로 모델 학습
+#rf 모델 생성, fit으로 학습 , predict메서드로 xtest데이터에 대한 예측값을 pred에 저장한다. 
+#score 메서드를 통해 평균 정확도를 확인할 수 있다.
+
+#모델생성
+from sklearn.ensemble import RandomForestClassifier
+rf_clf=RandomForestClassifier(n_estimators=300, min_samples_split=30) #300,30~ 500,50쌍 정도 범위에서 최상의 결과
+#학습, 예측하고 저장한다.
+rf_pred=rf_clf.fit(xtrain, ytrain).predict(xtest)
+print("정확도 : ", rf_clf.score(xtest, ytest))
+
+
+
+
+#---------------------------------------------------------------------------
+#위에 학습과 예측 함수를 하나로 묶어보자
+
+def fitnpred():
+    from sklearn.tree import DecisionTreeClassifier
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.linear_model import LogisticRegression
+    
+    
+    dt_clf=DecisionTreeClassifier(max_depth=3).fit(xtrain,ytrain)
+    dt_pred=dt_clf.predict(xtest)
+    print("정확도 : ", dt_clf.score(xtest, ytest))
+    print(eval(dt_pred))
+    rf_clf=RandomForestClassifier(n_estimators=300, min_samples_split=30) #300,30~ 500,50쌍 정도 범위에서 최상의 결과
+    rf_pred=rf_clf.fit(xtrain, ytrain).predict(xtest)
+    print("정확도 : ", rf_clf.score(xtest, ytest))
+    print(eval(rf_pred))
+    logR=LogisticRegression().fit(xtrain,ytrain)
+    logR_pred=logR.predict_proba(xtest)
+    print("정확도 : ", logR.score(xtest, ytest))
+    #print(eval(logR_pred))   
+
+print(fitnpred())
+"""
+#결정트리의 혼동행렬 출력하고 분류분석의 다양한 성능평가지표로 결정트리의 성능 확인
+
+from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
+dt_cm=confusion_matrix(ytest,dt_pred)   #ytest와 xtest로예측한 pred와 비교
+dt_acc=accuracy_score(ytest,dt_pred)
+dt_prc=precision_score(ytest, dt_pred)
+dt_rcll=recall_score(ytest,dt_pred)
+dt_f1=f1_score(ytest, dt_pred)
+print('혼동행렬 : \n', cm)
+print('\n')
+print('정확도 : {}'.format(dt_acc))
+print('정밀도 : {}'.format(dt_prc))
+print('재현율 : {}'.format(dt_rcll))
+print('f1 : {}'.format(dt_f1))
+
+
+#classification_report 를 통한 결정트리의 분석결과 확인
+from sklearn.metrics import classification_report
+dt_report = classification_report(ytest,dt_pred)
+print(dt_report)
+
+"""
+
+
+#---------------------------------------------------------------------------
+
+
+#성능평가지표 부분을 함수화 시켜보자
+#결정트리의 혼동행렬 출력하고 분류분석의 다양한 성능평가지표로 결정트리의 성능 확인
+def eval(pred):
+    from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
+    cm=confusion_matrix(ytest,pred)   #ytest와 xtest로예측한 pred와 비교
+    acc=accuracy_score(ytest,pred)
+    prc=precision_score(ytest, pred)
+    rcll=recall_score(ytest,pred)
+    f1=f1_score(ytest, pred)
+    print('혼동행렬 : \n', cm)
+    print('\n')
+    print('정확도 : {}%'.format(round(acc*100,2)))
+    print('정밀도 : {}%'.format(round(prc*100,2)))
+    print('재현율 : {}%'.format(round(rcll*100,2)))
+    print('f1 : {}%'.format(round(f1*100,2)))
+
+
+#print(eval(dt_pred))
+
+#classification_report 를 통한 결정트리의 분석결과 확인
+from sklearn.metrics import classification_report
+dt_report = classification_report(ytest,dt_pred)
+print(dt_report)
+
+
+
+
+#로지스틱 회귀의 성능평가지표함수를 활용한 성능평가
+#print(eval(rf_pred))
+#---------------------------------------------------------------------------
+
+
+
+
+
+
+"""
+#예측결과 ROC 곡선으로 시각화하고 ROC 곡선의 면적 계산해보기
+#면적이 1에 가까울수록 분류모델의 성능이 좋다고 할수 있다.
+
+import matplotlib.pyplot as plt
+from sklearn.metrics import plot_roc_curve, roc_auc_score
+plot_roc_curve(dt_clf, xtest, ytest)
+plt.show()
+
+r_a_score=roc_auc_score(ytest, dt_clf.predict_proba(xtest)[:,1])
+print("ROC AUC sore : ",r_a_score)
+"""
+
+
+
+#---------------------------------------------------------------------------
+
+#예측결과 ROC 곡선으로 시각화하고 ROC 곡선의 면적 계산해보기
+#면적이 1에 가까울수록 분류모델의 성능이 좋다고 할수 있다.
+#함수화 시키기
+def roc_auc_curve(clf):
+    import matplotlib.pyplot as plt
+    from sklearn.metrics import plot_roc_curve, roc_auc_score
+    plot_roc_curve(clf, xtest, ytest)
+    plt.show()
+    
+    r_a_score=roc_auc_score(ytest, clf.predict_proba(xtest)[:,1])
+    print("ROC AUC sore : ",r_a_score)
+    
+print(roc_auc_curve(dt_clf))
+print(roc_auc_curve(rf_clf))
+
+#---------------------------------------------------------------------------
+#변수중요도 확인 
+def importances(clf):
+    importances=clf.feature_importances_
+    col= pd.DataFrame(train_pre.columns)
+    feature_importances=pd.concat([col,pd.DataFrame(importances)],axis=1)
+    feature_importances.columns=['col','importances']
+    print(feature_importances)
+    
+print(importances(dt_clf))
+"""
+#결괏값
+                   col  importances
+0                  Age     0.092200
+1      Employment Type     0.000000
+2        GraduateOrNot     0.002072
+3         AnnualIncome     0.729318
+4        FamilyMembers     0.176411
+5      ChronicDiseases     0.000000
+6        FrequentFlyer     0.000000
+7  EverTravelledAbroad     0.000000
+"""
+
+print(importances(rf_clf))
+
+#로지스틱 회귀에서 변수중요도의 막대그래프로 시각화는 다음번에 하기
+
+
+#------------------------------------------------------------------------
+
+#결정트리의 분류 의사결정 시각화 . Graphviz로 결정트리를 시각화할 수 있다.
+import numpy as np
+train2=train.drop(['ID'], axis=1, inplace=False)
+feature_columns=list(train2.columns.difference(['TravelInsurance']))
+feature_names=feature_columns
+target_names=np.array(['0','1'])
+
+import pydot
+import pydotplus
+import graphviz
+from sklearn.tree import export_graphviz
+dt_dot_data=export_graphviz(dt_clf,feature_names=feature_names,class_names=target_names,
+                            filled=True, rounded=True, special_characters=True)
+dt_graph=pydotplus.graph_from_dot_data(dt_dot_data)
+
+from IPython.display import Image
+Image(dt_graph.create_png())
+
+
+"""
+결과
+
+혼동행렬 : 
+ [[185   5]
+ [ 42  66]]
+
+
+정확도 : 0.8422818791946308
+정밀도 : 0.9295774647887324
+재현율 : 0.6111111111111112
+f1 : 0.7374301675977653
+              precision    recall  f1-score   support
+
+           0       0.81      0.97      0.89       190
+           1       0.93      0.61      0.74       108
+
+    accuracy                           0.84       298
+   macro avg       0.87      0.79      0.81       298
+weighted avg       0.86      0.84      0.83       298
+
+ROC AUC sore :  0.8136939571150097
+                   col  importances
+0                  Age     0.092200
+1      Employment Type     0.000000
+2        GraduateOrNot     0.002072
+3         AnnualIncome     0.729318
+4        FamilyMembers     0.176411
+5      ChronicDiseases     0.000000
+6        FrequentFlyer     0.000000
+7  EverTravelledAbroad     0.000000
+
+"""
+
+
+#결과를 예측확률값으로 계산한다.
+dt_y_pred=dt_clf.predict_proba(x_fin_test)[:,1]
+print(dt_y_pred)
+
+#결과를 csv파일로 저장
+result=pd.DataFrame({"y_pred" : dt_y_pred})
+result.to_csv("E:\개발자/insurance_dt_y_pred.csv") 
