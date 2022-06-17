@@ -42,7 +42,16 @@ data2.iloc[:9,0]=crim10
 print(data2.head(12))
 """
 #-------------------------------------------------------------------------
+import time
+st = time.time()
 
+
+
+
+
+
+
+#메인코드
 s=0
 c=0
 for i in range(506):               #내코드
@@ -50,14 +59,71 @@ for i in range(506):               #내코드
         s+=data2['CRIM'].iloc[i]
         c+=1
 
+
+
+
+
+
+
+# wait for 3 seconds
+time.sleep(3)
 print(s/c)
 
+et = time.time()
+
+# get the execution time
+elapsed_time = et - st
+print('Execution time:', elapsed_time, 'seconds')
+
 """
-#이게 어려워
-#예문사에서 배운 새로운 표현 
-data3=data2[data2['AGE']>=80]      #조건지정한 데이터 세트 생성   #중요!
-result=data3['CRIM'].mean()
-print(result)
+5.759386624999999
+Execution time: 3.0076839923858643 seconds
 """
 
+
+
+
+
+
+
+
+#--------------------------------------------------------------------------
+
+#이게 어려워
+#예문사에서 배운 새로운 표현 
+import time
+st = time.time()
+
+
+
+
+
+
+
+#메인코드
+data3=data2[data2['AGE']>=80]      #조건지정한 데이터 세트 생성   #중요!
+result=data3['CRIM'].mean()
+
+
+
+
+
+
+
+
+
+# wait for 3 seconds
+time.sleep(3)
+print(result)
+
+et = time.time()
+
+# get the execution time
+elapsed_time = et - st
+print('Execution time:', elapsed_time, 'seconds')
+
+"""
+5.759386624999999
+Execution time: 3.003513813018799 seconds              #확실히 시간 1/2로 단축
+"""
 #-------------------------------------------------------------------------
