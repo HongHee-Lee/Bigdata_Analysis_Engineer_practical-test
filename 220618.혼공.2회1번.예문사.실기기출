@@ -1,0 +1,63 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jun 17 23:32:55 2022
+
+@author: greenysky
+"""
+
+import pandas as pd
+data= pd.read_csv("E:\개발자/201_boston.csv")
+print(data)
+
+pd.set_option("display.max_columns", None)
+
+data.describe
+display(data)
+
+data.isnull().sum()
+
+data.describe()
+
+data.axes[1].tolist
+
+#help(data.sort_values)
+
+data2=data.sort_values(by='CRIM', ascending=False)    #crim 기준으로 오름차순정렬
+print(data2.head(10))
+
+
+crim10=data2['CRIM'].iloc[9]       #==iloc[9,0]
+print(crim10)            #25.9406
+
+
+
+#-------------------------------------------------------------------------
+for i in range(9):                    #내코드
+    data2['CRIM'].iloc[i]=crim10            #25.9406으로 상위 10개 crim을 채우기
+print(data2.head(15))
+
+"""
+#이걸간단하게                      #예문사 코드
+data2.iloc[:9,0]=crim10
+print(data2.head(12))
+"""
+#-------------------------------------------------------------------------
+
+s=0
+c=0
+for i in range(506):               #내코드
+    if data2['AGE'].iloc[i]>=80:           #iloc 쓸때 ()아님! iloc[]임!
+        s+=data2['CRIM'].iloc[i]
+        c+=1
+
+print(s/c)
+
+"""
+#이게 어려워
+#예문사에서 배운 새로운 표현 
+data3=data2[data2['AGE']>=80]      #조건지정한 데이터 세트 생성   #중요!
+result=data3['CRIM'].mean()
+print(result)
+"""
+
+#-------------------------------------------------------------------------
