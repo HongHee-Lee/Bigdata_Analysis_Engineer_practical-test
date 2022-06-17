@@ -196,11 +196,8 @@ def eval(pred):
 
 
 #--------------------------------------------------------------
-
-#데이터 분류분석 수행하기
-
+#데이터 분류분석 수행하기  #데이터 모델 함수 #모생학예저
 #모델 생성, fit으로 학습 , predict메서드로 xtest데이터에 대한 예측값을 pred에 저장한다. 
-#위에 학습과 예측 함수를 하나로 묶어보자
 
 def model():
    
@@ -213,8 +210,7 @@ def model():
     dt_pred=dt_clf.predict(xtest)    #predict(xtest)로 예측하고 pred에 저장한다.
     print("정확도 : ", dt_clf.score(xtest, ytest))   #score 메서드를 통해 평균 정확도를 확인할 수 있다.
     print(eval(dt_pred))
-    
-    
+        
     global rf_clf
     rf_clf=RandomForestClassifier(n_estimators=300, min_samples_split=30) #모델생성 #300,30~ 500,50쌍 정도 범위에서 최상의 결과
     rf_pred=rf_clf.fit(xtrain, ytrain).predict(xtest)      #학습, 예측하고 저장한다.
