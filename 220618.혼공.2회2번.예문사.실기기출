@@ -1,0 +1,48 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jun 17 23:32:55 2022
+
+@author: greenysky
+"""
+
+import pandas as pd
+data=pd.read_csv("E:\개발자/202_housing.csv")
+print(data)
+
+data.describe
+data.describe()
+
+pd.set_option('display.max_columns',None)
+
+"""
+자투리공부
+b=data.axes[1].tolist().index('median_house_value')    #median_house_value의 index를 얻는 방법
+print(b)
+"""
+
+
+n=int(len(data)*0.8)         #전체길이에서 80%의 데이터의 개수 구하기 
+                             #len을 쓰면 float이기 때문에 int로 형변환을 해준다
+data2=data.iloc[:n]          #80%의 데이터 추출
+print(data2)
+
+
+print(data2.isnull().sum())    #결측치확인
+
+#결측치를 total_bedrooms의 중앙값으로 대체
+
+help(data2.fillna)      #결측값 채우기 함수 사용법확인
+
+
+data3=data2.fillna(value=data2['total_bedrooms'].median())    #total_bedrooms 중앙값으로 결측값채우기
+print(data3)
+print(data3.isnull().sum())    #data3의 결측값 확인
+
+
+help(data2.abs)
+
+
+
+#결측치 대체 전후 total_bedrooms 표준편차값의 차이의 절대값을 계산
+#절대값함수 사용법 숙지\
+print(abs(data2['total_bedrooms'].std()- data3['total_bedrooms'].std()))
