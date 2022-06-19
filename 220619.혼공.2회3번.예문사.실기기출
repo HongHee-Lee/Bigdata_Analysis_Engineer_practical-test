@@ -1,0 +1,42 @@
+import pandas as pd
+data=pd.read_csv("E:\개발자/203_housing.csv")
+print(data)
+
+up=data['population'].mean()+1.5*(data['population'].std())   #상한 = 평균 +1.5표준편차
+low=data['population'].mean()-1.5*(data['population'].std())    #하한 = 평균-1.5표준편차
+
+#or 조건 사용해 population이 상한보다 크거나 population이 하한보다 작은 값들을 모은 데이터 출력
+data2=data['population'][(data['population']>up) | (data['population']<low)]    #소괄호 () 빼먹지 말기!!
+print(data2.sum())  #데이터 합계 구하기
+
+
+
+
+#-------------------------------------------------------------------------
+#상자 수염 그림(박스 플롯)그리고 1,3사분위수 로 이상치 합계구하기
+import pandas as pd
+data=pd.read_csv("E:\개발자/203_housing.csv")
+
+pd.set_option("display.max_columns",None)
+data.describe
+
+#박스플롯 그리기
+import matplotlib.pyplot as plt
+plt.boxplot(data['population'], whis=1.5)
+plt.title('population')
+plt.show()
+
+
+
+q1=data.describe().loc['25%','population']
+q3=data.describe().loc['75%','population']
+"""
+#예문사에서 알려주는 3분위수 1분위수 가져오는 코드
+import numpy as np
+q1,q3=np.percentile(data['population'],[25,75])
+"""
+iqr=q3-q1
+population_outliers=data['population'][(data['population']>(q3+1.5*iqr)) | (data['population']<(q1-1.5*iqr))]
+print(population_outliers)
+print('\n')
+print(population_outliers.sum())
