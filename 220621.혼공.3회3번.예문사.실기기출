@@ -1,0 +1,23 @@
+import pandas as pd
+data=pd.read_csv("E:\개발자/303_titanic.csv")
+max=data.isnull().sum().max()
+nulsum=data.isnull().sum()   #isnull().sum()함수를 별도의 데이터로 만들어주기
+data2=nulsum[nulsum==max]   #최대값으로 별도의 데이터를 만들어주기
+print(str(data2.index[0]))       #index를 사용해 행명 출력
+print(str(data2.axes[0][0]))     #axes를 사용해 행명 출력
+
+
+#예문사 코드
+data2=data.isna().sum()      #결측값 갯수 집계하여 isna 객체에 할당한다.
+max_idx=data2.argmax()           #집계값이 최대인 행의 index값 찾기
+data2.index[max_idx]             #인덱스 값에 해당하는 인덱스 이름 출력
+
+"""
+#자투리코드
+
+#data컬럼의 3번째 index의 컬럼명을 출력하시오
+data.columns[2]
+
+#data컬럼의 8번째 index의 컬럼명을 출력하시오
+data.columns[7]
+"""
