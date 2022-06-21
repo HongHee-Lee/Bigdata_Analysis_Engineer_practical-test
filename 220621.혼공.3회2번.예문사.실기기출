@@ -7,13 +7,13 @@ print(data)
 
 #2000년도의 평균값 구하기
 i=data['year'].tolist().index(2000)   #year 컬럼을 리스트로 만들고 2000의 인덱스 추출
+data=data.drop(['year'],axis=1)       #year 컬럼 드랍
 m=data.iloc[i,:].mean()               #year=2000인 데이터 추출해서 평균값 구하기
 print(m)
 
 #m보다 더 큰 값을 가진 국가의 수 계산
 data2=data.iloc[i,:]                  #year=2000인 데이터를 data2로 추출하기
-data3=data2.drop(['year'],axis=0)     #data2에서 year 행을 없애기
-print(data3[data3>m].count())         #평균보다 큰 조건을 만족하는 개수세기
+print(data2[data2>m].count())         #평균보다 큰 조건을 만족하는 개수세기
 
 #---------------------------------------------------------------------------
 #예문사코드(year=2000데이터를 나는 세로로 주욱 뽑았지만,
@@ -23,8 +23,11 @@ data3=data2.drop(['year'],axis=1)  #year 데이터 삭제(드랍)
 data4=data3.T                      #행.열 변환
 data4.columns=['value']            #컬럼명 'value'로 설정해준다
 m=data4['value'].mean()            #컬럼명을 사용해 'value'의 평균을 계산해준다
-print(m)                               #이렇게 계산하면 소수점 자리수가 더 많이 나온다
+print(m)
 
+data5=data4[data4>m]
+count=data5.count()
+print(count)
 """
 #자투리코드
 #data4의 컬럼명 1을 컬럼명 'what'으로 바꾸기
