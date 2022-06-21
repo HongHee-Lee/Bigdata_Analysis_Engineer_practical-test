@@ -1,0 +1,39 @@
+import pandas as pd
+data=pd.read_csv("E:\개발자/302_worlddata.csv")
+pd.set_option("display.max_columns", None)   #데이터 펼치기
+print(data)
+
+#2000년도의 평균값보다 더 큰 유병률 값을 가진 국가의 수 계산
+
+#2000년도의 평균값 구하기
+i=data['year'].tolist().index(2000)   #year 컬럼을 리스트로 만들고 2000의 인덱스 추출
+m=data.iloc[i,:].mean()               #year=2000인 데이터 추출해서 평균값 구하기
+print(m)
+
+#m보다 더 큰 값을 가진 국가의 수 계산
+data2=data.iloc[i,:]                  #year=2000인 데이터를 data2로 추출하기
+data3=data2.drop(['year'],axis=0)     #data2에서 year 행을 없애기
+print(data3[data3>m].count())         #평균보다 큰 조건을 만족하는 개수세기
+
+#---------------------------------------------------------------------------
+#예문사코드(year=2000데이터를 나는 세로로 주욱 뽑았지만,
+#이코드는 가로로 원본데이터에 가깝게 추출할수있다.)
+data2=data[data['year']==2000]     #year=2000 조건을 적용한 데이터 셋 추출
+data3=data2.drop(['year'],axis=1)  #year 데이터 삭제(드랍)
+data4=data3.T                      #행.열 변환
+data4.columns=['value']            #컬럼명 'value'로 설정해준다
+m=data4['value'].mean()            #컬럼명을 사용해 'value'의 평균을 계산해준다
+print(m)                               #이렇게 계산하면 소수점 자리수가 더 많이 나온다
+
+"""
+#자투리코드
+#data4의 컬럼명 1을 컬럼명 'what'으로 바꾸기
+data5=data4.rename(columns={1":"what?"})  
+print(data5)
+
+컬럼명 변경
+data2=data.iloc[:2,:3]    #data에서 2행까지, 3열까지 2*3행렬의 데이터를 추출한다
+data2.columns=['one', 'two', 'three']    #추출한 2*3행렬의 컬럼명을 'one','two', 'three'로 바꿔준다
+print(data2)
+
+"""
