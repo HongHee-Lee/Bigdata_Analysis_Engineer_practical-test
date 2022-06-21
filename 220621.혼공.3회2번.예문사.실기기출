@@ -25,8 +25,7 @@ data4.columns=['value']            #컬럼명 'value'로 설정해준다
 m=data4['value'].mean()            #컬럼명을 사용해 'value'의 평균을 계산해준다
 print(m)
 
-data5=data4[data4>m]
-count=data5.count()
+count=data4[data4>m].count()
 print(count)
 """
 #자투리코드
