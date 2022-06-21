@@ -1,0 +1,30 @@
+
+import pandas as pd
+data=pd.read_csv("E:\개발자/301_housing.csv")
+pd.set_option('display.max_rows',10,'display.max_columns', None)
+print(data)
+
+data.isna().sum()
+
+dir(data)
+help(data.dropna)
+
+#결측치가 있는 행을 모두제거 (how사용)
+data=data.dropna(axis=0, how='any')
+
+data.isna().sum()
+len(data)
+
+#위에서부터 70%의 데이터를 추출하기
+data2=data.iloc[:int(len(data)*0.7)]
+print(data2)
+
+
+help(data2.describe())
+#'housing_median_age'의 Q1(제1사분위수)값을 정수로 계산하기
+q1=int(data2.describe().loc['25%', 'housing_median_age'])
+print(q1)
+"""
+#예문사에서 배우는 q1값 계산 코드
+q1=int(data2['housing_median_age'].quantile(0.25))
+print(q1)
