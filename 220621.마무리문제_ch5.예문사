@@ -1,0 +1,44 @@
+import pandas as pd
+data=pd.read_csv("E:\개발자/iris.csv")
+print(data)
+
+#--------------------------------------------------------------------
+#1번 species 변수 값별로 petal_width 상휘 25%값을 구하고, 가장 큰값과 가장 작은 값 차이 구하기
+print(data.groupby('species')['petal_width'].describe().loc[:,'75%'])
+print(data.groupby('species')['petal_width'].quantile([0.75]))
+
+#--------------------------------------------------------------------
+#2번 Iris 에서 sepal_length변수의 전체 값들을 중복없이 list로 만든 후 ,
+#오름차순으로 정렬시 10번째에 오는 값을 구하시오
+data2=data['sepal_length'].drop_duplicates().tolist() #중복없이 list로 만들기
+#drop_duplicates() 대신에 unique()함수를 쓸 수도 있다.
+data2.sort()           #오름차순으로 정렬
+print(data2[9])        #10번째에 오는 값 구하기
+
+#--------------------------------------------------------------------
+#3번 sepal_width변수 값으로 내림차순한 후 위에서부터 100개 행을 학습 데이터로 분리하고, 
+#학습데이터에서 sepal_width의 표준편차 값을 구한 후 50을 곱한 값을 계산하시오(소수점 이하는 버린다)
+data2=data.sort_values(by='sepal_width',ascending=False).reset_index(drop=True) #인덱스를 리셋해준다
+data3=data2.iloc[:100]     #100개분리
+print(int(data3['sepal_width'].std()*50)) #소수점 이하를 버릴때 int를 쓴다는 것도 기억해두자
+
+#---------------------------------------------------------------------
+#4번 species 변수 값별로 petal_length 상위 10개 행(큰 값)의 평균값을 구한 후,
+#평균값의 합을 계산하시오(소수점 이하는 반올림한다.)
+
+#species와 petal_length별로 정렬하기(petal_length는 내림차순)
+data2=data.sort_values(by=['species','petal_length'],ascending=[True,False])
+#species별 petal_length상위 10개 데이터들로 새로운 데이터 구성
+data3=data2.groupby('species').head(10)
+#species별 petal_length상위 10개 평균을 구하고 합계를 구하기
+print(round(data3.groupby('species')['petal_length'].mean().sum()))
+
+#--------------------------------------------------------------------
+#5번 sepal_length변수가 이상치를 가지는 데이터 행 수를 계산하기
+#이상치 는 평균+-2표준편차를 기준으로한다.
+up=data['sepal_length'].mean()+2*data['sepal_length'].std()   #up
+down=data['sepal_length'].mean()-2*data['sepal_length'].std()  #down
+
+#이상치 개수 계산(이상, 이하)
+n=data['sepal_length'][(data['sepal_length']>=up)|(data['sepal_length']<=down)].count()
+print(n)
