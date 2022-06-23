@@ -1,0 +1,69 @@
+import pandas as pd
+data=pd.read_csv('E:\개발자/wine.csv')
+print(data)
+
+#1번
+data.isnull().sum()
+#total_phenols 결측치를 제거하고
+help(data.dropna)
+data2=data.dropna(subset=['total_phenols'])   #결측치 제거(널을 지운다)
+data2.isna().sum()
+
+#alcalinity_of_ash 변수의 결측치는 중앙값으로 대체한후
+#전체 결측치를 중앙값으로 채우기
+data3=data2.fillna(value=data2['alcalinity_of_ash'].median())  
+
+#alcalinity_of_ash의 평균값을 계산하시오(소수점이하는 버린다)
+print(int(data3['alcalinity_of_ash'].mean()))
+#-----------------------------------------------------------------------------
+#예문사 1번
+#total_phenols에 널이 아닌것을 골라낸다
+data2=data[data['total_phenols'].notnull()]
+
+#alcalinity of ash의 중앙값을 저장한다
+med=data2['alcalinity_of_ash'].median()
+
+#alcalinity_of_ash 변수의 결측치는 중앙값으로 대체한다
+data2.loc[data2['alcalinity_of_ash'].isnull(), 'alcalinity_of_ash']=med
+
+#alcalinity_of_ash의 평균값을 계산하라(소수점이하는 버린다)
+print(data2['alcalinity_of_ash'].mean())
+
+#------------------------------------------------------------------------
+#2번
+#alcohol값이 alcohol 평균 값 이상이고, 
+#color_intensity값이 color_intensity 평균값 이상인 데이터만 남겼을때
+#가장 많은 class 값을 구하시오
+
+data2=data[(data['alcohol']>=data['alcohol'].mean()) & 
+           (data['color_intensity']>=data['color_intensity'].mean())]
+
+#groupby. sum 대신에 사용할수 있는 함수를 사용해서 class 값별 최대개수 구하기
+print(max(data2['class'].value_counts()))
+
+#------------------------------------------------------------------------
+#3번
+#class 1에 해당하는 데이터의 ash 평균값과
+#wine데이터 모든 결측치 제거 후의 ash 평균값의 차이의 절대값 계산
+#dropna함수를 사용하면 데이터프레임의 결측치 전부를 쉽게 제거할 수 있다.
+#소수점 4째자리에서 반올림
+print(round(abs(data[data['class']==1]['ash'].mean() - data.dropna()['ash'].mean()),3))
+
+#------------------------------------------------------------------------
+#4번
+#alcohol을 오름차순 정렬시 상위 20번째 값으로 상위 20개 값 변환후, 
+#proanthocyanins가 2이하인 데이터를 추출하여 alcohol의 평균값을 계산하시오
+#소수점 3번째 자리에서 반올림한다
+
+#index값도 0123...로 변환해준다
+data2=data.sort_values(by='alcohol', ascending=True).reset_index(drop=True)
+data2.loc[:19,'alcohol']=data2.loc[19,'alcohol']
+print(round(data2[data2['proanthocyanins']<=2]['alcohol'].mean(),2))
+
+#------------------------------------------------------------------------
+#5번
+#class1중 proline 변수의 3사분위수와 1사분위수 차를 구하고,
+#class2중 proline 변수의 3사분위수와 1사분위수 차를 구하여 두값차이의 절대값계산
+d1_q1, d1_q3=data[data['class']==1]['proline'].quantile([0.25, 0.75])
+d2_q1, d2_q3=data[data['class']==2]['proline'].quantile([0.25, 0.75])
+print(abs(d1_q3-d1_q1)-(d2_q3-d2_q1))
