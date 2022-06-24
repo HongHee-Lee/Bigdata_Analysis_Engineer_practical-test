@@ -28,6 +28,9 @@ xtrain_pre=xtrain_pre.loc[xtrain_pre.u != -9999]
 
 #print(xtrain_pre.describe())
 
+#원핫인코딩
+xtrain_pre=pd.get_dummies(xtrain_pre)
+xtest_pre=pd.get_dummies(xtest_pre)
 
 #스케일링
 from sklearn.preprocessing import StandardScaler
