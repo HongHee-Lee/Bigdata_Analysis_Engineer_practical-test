@@ -1,0 +1,129 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Jun 24 21:41:39 2022
+
+@author: greenysky
+"""
+
+import pandas as pd
+xtrain_pre=pd.read_csv('E:\개발자/stellar_X_train.csv')
+xtest_pre=pd.read_csv('E:\개발자/stellar_X_test.csv')
+ytrain_pre=pd.read_csv('E:\개발자/stellar_y_train.csv')
+
+pd.set_option('display.max_columns',None)
+#print(xtrain_pre) #70000
+#print(xtest_pre) #30000
+
+
+len(xtrain_pre.columns.tolist())
+
+
+#전처리 전생원스
+#xtrain_pre xtest_pre 합치기(함께 전처리해주기)
+#이상치 제거
+xtrain_pre.describe()
+xtest_pre.describe()
+ytrain_fin=ytrain_pre.loc[xtrain_pre.u != -9999]   #y 먼저 제거해주기!
+xtrain_pre=xtrain_pre.loc[xtrain_pre.u != -9999]
+
+#print(xtrain_pre.describe())
+
+
+#스케일링
+from sklearn.preprocessing import StandardScaler
+sscaler=StandardScaler()
+
+xtrain_fin=sscaler.fit_transform(xtrain_pre)
+xtest_fin=sscaler.fit_transform(xtest_pre)
+
+print(xtrain_fin.shape)
+print(xtest_fin.shape)
+print(ytrain_fin.shape)
+
+
+#----------------------------------------------
+#나EMR
+
+#데이터 나누기
+from sklearn.model_selection import train_test_split
+xtrain, xtest, ytrain, ytest=train_test_split(xtrain_fin, ytrain_fin,
+                                              stratify=ytrain_fin,
+                                              test_size=0.2,
+                                              random_state=0)
+print(xtrain.shape)
+print(xtest.shape)
+print(ytrain.shape)
+print(ytest.shape)
+
+
+#E : 성능평가지표 함수
+def eval(pred):
+    from sklearn.metrics import confusion_matrix, accuracy_score, precision_score, recall_score, f1_score
+    cm=confusion_matrix(ytest,pred)
+    acc=accuracy_score(ytest,pred)
+    pr=precision_score(ytest,pred)
+    rcl=recall_score(ytest,pred)
+    f1=f1_score(ytest,pred)
+    
+    print('혼동행렬 : ','\n',cm)
+    print('정확도 : {}%'.format(round(acc*100,2)))
+    print('정밀도 : {}%'.format(round(pr*100,2)))
+    print('재현율 : {}%'.format(round(rcl*100,2)))
+    print('f1_score : {}%'.format(round(f1*100,2)))
+    
+    from sklearn.metrics import classification_report
+    report = classification_report(ytest, pred)
+    print(report)
+
+#M : 모델생성 (모생학예저)
+def model():
+    from sklearn.tree import DecisionTreeClassifier
+    from sklearn.ensemble import RandomForestClassifier
+    from sklearn.linear_model import LogisticRegression
+    
+    global dt_clf
+    #의사결정나무
+    dt_clf=DecisionTreeClassifier(max_depth=7, min_samples_split=5,
+                max_leaf_nodes=7, min_samples_leaf=5).fit(xtrain,ytrain)
+    dt_pred=dt_clf.predict(xtest)
+    print('정확도 : ', dt_clf.score(xtest,ytest))
+    print(eval(dt_pred))
+    
+    global rf_clf
+    #랜덤포레스트
+    rf_clf=RandomForestClassifier(n_estimators=330, min_samples_split=28,
+                                  max_depth=5, bootstrap=False).fit(xtrain,ytrain)
+    rf_pred=rf_clf.predict(xtest)
+    print('정확도 : ',rf_clf.score(xtest,ytest))
+    print(eval(rf_pred))
+    
+    global logR
+    #로지스틱회귀
+    logR=LogisticRegression().fit(xtrain,ytrain)
+    logR_pred=logR.predict(xtest)
+    print('정확도 : ',logR.score(xtest,ytest))
+    print(eval(logR_pred))
+
+#R : ROC_Curve 그리고 roc_auc 점수 계산
+def roc_auc(clf):
+    import matplotlib.pyplot as plt
+    from sklearn.metrics import plot_roc_curve, roc_auc_score
+    plot_roc_curve(clf,xtest,ytest)
+    plt.show()
+    
+    r_a_score=roc_auc_score(ytest, clf.predict_proba(xtest)[:,1])
+    print('ROC_AUC_점수 : ',r_a_score)
+    
+print(model())
+print(roc_auc(dt_clf))
+print(roc_auc(rf_clf))
+print(roc_auc(logR))
+#--------------------------------------------------------------------
+#최예결저
+
+#최종예측
+ypred=dt_clf.predict_proba(xtest_fin)[:,1]
+
+#결과저장
+result=pd.DataFrame(ypred, columns=['galaxy'])
+result.to_csv('E:\개발자/004003566.csv')
