@@ -122,7 +122,7 @@ print(roc_auc(logR))
 #최예결저
 
 #최종예측
-ypred=dt_clf.predict_proba(xtest_fin)[:,1]
+ypred=dt_clf.predict(xtest_fin)
 
 #결과저장
 result=pd.DataFrame(ypred, columns=['galaxy'])
